@@ -9,7 +9,17 @@ class TestRegionFunctions(unittest.TestCase):
     def setUp(self):
         self.rect = GlobeRect(lo_lat=10.0, hi_lat=20.0, west_long=30.0, east_long=40.0)
         self.region = Region(rect=self.rect, name="Testland", terrain="other")
+        self.regionregion = Region(rect=self.rect, name="Testy", terrain="other")
         self.rc = RegionCondition(region=self.region, year=2025, pop=1000, ghg_rate=5000.0)
+        self.rcc = RegionCondition(region=self.regionregion, year=2025, pop=500, ghg_rate=5000.0)
+        self.newrc = RegionCondition(region=self.region, year=2026, pop=1000, ghg_rate=5000)
+
+        #wl -l1 - 0.52359 
+        # el -l2 - 0.6981 
+        # ll - t1 - 0.1745329 
+        # hl-t2 - 0.349065 
+        #area - 1195283.024
+        #em per sq km - 0.00418
 
     def test_data_classes_exist(self):
         self.assertIsInstance(self.rect, GlobeRect)
@@ -32,10 +42,13 @@ class TestRegionFunctions(unittest.TestCase):
         result = densest([self.rc])
         self.assertEqual(result, "Testland")
 
+
     def test_project_condition(self):
         projected = project_condition(self.rc, 5)
         self.assertIsInstance(projected, RegionCondition)
         self.assertEqual(projected.year, self.rc.year + 5)
+    
 
 if __name__ == '__main__':
     unittest.main()
+
