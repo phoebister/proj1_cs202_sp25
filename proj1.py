@@ -13,8 +13,6 @@ purpose statement:
 calculates emissions per capita, area, emissions per square km, and identifies the
 highest population density from a group of regions, and also predicts a regions population growth
 after a give number of years
-
-type comment:
 '''
 
 #data definitions
@@ -44,13 +42,13 @@ class RegionCondition:
 la_gr = GlobeRect(
     lo_lat = 33.7,
     hi_lat = 34.8,
-    west_long = -117.6,
-    east_long = -118.9
+    west_long = -118.9,
+    east_long = -117.6
 ) #N and W
 
 nsw_gr = GlobeRect(
-    lo_lat = 38.0,
-    hi_lat = 28.0,
+    lo_lat = -38.0,
+    hi_lat = -28.0,
     west_long = 141.0,
     east_long = 154.0
 ) #S and E
@@ -58,15 +56,15 @@ nsw_gr = GlobeRect(
 slo_gr = GlobeRect(
     lo_lat = 34.54,
     hi_lat = 35.48,
-    west_long = 119.27,
-    east_long = 121.02
+    west_long = -121.02,
+    east_long = -119.27
 ) #N and W
 
 tac_gr = GlobeRect(
     lo_lat = 20.0,
     hi_lat = 22.5,
-    west_long = -70.0,
-    east_long = -72.5
+    west_long = -72.5,
+    east_long = -70.0
 )
 
 # region's now
@@ -74,7 +72,7 @@ tac_gr = GlobeRect(
 la_reg = Region(
     rect = la_gr,
     name = "Los Angeles County",
-    terrain = "mountains"
+    terrain = "other"
 )
 
 nsw_reg = Region(
@@ -102,28 +100,28 @@ region_conditions = [
         region= la_reg,
         year= 2025,
         pop= 9700000,
-        ghg_rate= 360.4
+        ghg_rate= 360400000
     ),
 
     RegionCondition(
         region= nsw_reg,
         year= 2018,
         pop= 8000000,
-        ghg_rate= 143.5
+        ghg_rate= 143500000
     ),
 
     RegionCondition(
         region= slo_reg,
         year= 2025,
         pop= 282440,
-        ghg_rate= 0.1506
+        ghg_rate= 150600
     ),
 
     RegionCondition(
         region = tac_reg,
         year = 2020,
         pop = 44300,
-        ghg_rate = 0.359 
+        ghg_rate = 359000
     )
 ]
 
@@ -151,16 +149,16 @@ def area(gr: GlobeRect) -> float:
 
 def emissions_per_square_km(rc: RegionCondition) -> float:
     em_per_sqkm = rc.ghg_rate/area(rc.region.rect)
+    if area(rc.region.rect) == 0:
+        return 0.0
     return em_per_sqkm
-
-def densest(rc_list: list[RegionCondition]) -> str:
-    #base case
-    dense = dense_helper(rc_list,0)
-    return dense.region.name
-#must be recursive, no while, min, max 
+ 
 
 #helper fn for density
 def dense_helper(rc_list, idx: int) -> RegionCondition:
+    if len(rc_list) == 1:
+        return rc_list[0]
+    
     if idx == len(rc_list)-1:
         return rc_list[idx]
     den = dense_helper(rc_list, idx+1)
@@ -171,7 +169,22 @@ def dense_helper(rc_list, idx: int) -> RegionCondition:
         return rc_list[idx]
     else: 
         return den
+def densest(rc_list: list[RegionCondition]) -> str:
+    if len(rc_list) == 0:
+        raise ValueError("list can't be empty")
+    dense = dense_helper(rc_list,0)
+    return dense.region.name
+#must be recursive, no while, min, max
     
+
+def helper_pop_grow(pop:int, rate: float, years: int) -> int:
+    new_pop = pop*(1+rate)**years
+    return int(round(new_pop,0))
+
+def helper_emissions(pop:int,np: int, ghg_em:float)->float:
+    new_em = ghg_em*(np/pop)
+    return new_em
+
 #projected condition time
 def project_condition(rc: RegionCondition, years: int) -> RegionCondition:
     if rc.region.terrain == "ocean":
@@ -186,11 +199,3 @@ def project_condition(rc: RegionCondition, years: int) -> RegionCondition:
     new_emissions = helper_emissions(rc.pop, new_population,rc.ghg_rate)
     projected = RegionCondition(rc.region,rc.year+years,new_population,new_emissions)
     return projected
-
-def helper_pop_grow(pop:int, rate: float, years: int) -> int:
-    new_pop = pop*(1+rate)**years
-    return int(round(new_pop,0))
-
-def helper_emissions(pop:int,np: int, ghg_em:float)->float:
-    new_em = ghg_em*(np/pop)
-    return new_em

@@ -11,12 +11,16 @@ class TestRegionFunctions(unittest.TestCase):
         self.region = Region(rect=self.rect, name="Testland", terrain="other")
         self.regionregion = Region(rect=self.rect, name="Testy", terrain="other")
         self.rc = RegionCondition(region=self.region, year=2025, pop=1000, ghg_rate=5000.0)
-        self.rcc = RegionCondition(region=self.regionregion, year=2025, pop=500, ghg_rate=5000.0)
+        self.rcc = RegionCondition(region=self.regionregion, year=2025, pop=1500, ghg_rate=5000.0)
         self.newrc = RegionCondition(region=self.region, year=2026, pop=1000, ghg_rate=5000)
+      
+      #wl -l1 - 0.52359 
+        # el -l2 - 0.6981 
+        # ll - t1 - 0.1745329 
+        # hl-t2 - 0.349065 
+        #area - 1195283.024
+        #em per sq km - 0.00418
 
-    def test_holder(self):
-        pass
-        #my tests now
     #emission_per_cap_test
     def test_reg_epc(self):
         result = emissions_per_capita(self.rc)
@@ -35,7 +39,7 @@ class TestRegionFunctions(unittest.TestCase):
     #test densest
     def test_densest(self):
         result = densest([self.rc,self.rcc])
-        self.assertEqual(result, "Testland")
+        self.assertEqual(result, "Testy")
 
     #test for projected conditions
     
