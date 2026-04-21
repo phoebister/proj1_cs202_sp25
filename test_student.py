@@ -13,6 +13,7 @@ class TestRegionFunctions(unittest.TestCase):
         self.rc = RegionCondition(region=self.region, year=2025, pop=1000, ghg_rate=5000.0)
         self.rcc = RegionCondition(region=self.regionregion, year=2025, pop=1500, ghg_rate=5000.0)
         self.newrc = RegionCondition(region=self.region, year=2026, pop=1000, ghg_rate=5000)
+        self.blank = []
       
       #wl -l1 - 0.52359 
         # el -l2 - 0.6981 
@@ -46,6 +47,9 @@ class TestRegionFunctions(unittest.TestCase):
     def test_proj_cond(self):
         result = project_condition(self.rc, 1)
         self.assertEqual(result, self.newrc)
+
+    def test_dense_empty(self):
+        self.assertRaises(ValueError, densest,[])
 
 
 if __name__ == '__main__':

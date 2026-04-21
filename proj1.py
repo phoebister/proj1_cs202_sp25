@@ -187,7 +187,9 @@ def helper_emissions(pop:int,np: int, ghg_em:float)->float:
 
 #projected condition time
 def project_condition(rc: RegionCondition, years: int) -> RegionCondition:
-    if rc.region.terrain == "ocean":
+    if years < 0:
+        raise ValueError("years must be non-negative")
+    elif rc.region.terrain == "ocean":
         rate = 0.0001
     elif rc.region.terrain =="mountains":
         rate = 0.0005
